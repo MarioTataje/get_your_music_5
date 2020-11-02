@@ -1,14 +1,15 @@
 package com.get_your_music_5.users_system.services
 
 import com.get_your_music_5.locations.repositories.DistrictRepository
+import com.get_your_music_5.users_system.models.Musician
+import com.get_your_music_5.users_system.models.Organizer
 import com.get_your_music_5.users_system.models.Profile
 import com.get_your_music_5.users_system.repositories.ProfileRepository
 import com.get_your_music_5.users_system.repositories.UserRepository
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.lang.IllegalArgumentException
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class ProfileService(
@@ -16,6 +17,11 @@ class ProfileService(
         private val userRepository: UserRepository,
         private val districtRepository: DistrictRepository
 ) {
+    private final val currentDate: LocalDateTime = LocalDateTime.now()
+    val currentDateFormat: String = currentDate.format(DateTimeFormatter.ISO_DATE)
+
+
+
     fun getAll(): List<Profile> = profileRepository.findAll()
 
     fun getAllByDistrictId(districtId: Long): List<Profile> = profileRepository.getByDistrictId(districtId)
@@ -27,14 +33,20 @@ class ProfileService(
 
     @Transactional
     fun save(profile: Profile, userId: Long, districtId: Long): Profile {
-        val currentDate = LocalDateTime.now()
-        val currentDateFormat = currentDate.format(DateTimeFormatter.ISO_DATE)
-        profile.registerDate = currentDateFormat
-        profile.user = userRepository.findById(userId)
+        val newProfile: Profile = if (profile.type == "Musician") Musician() else Organizer()
+        newProfile.firstName = profile.firstName
+        newProfile.lastName = profile.lastName
+        newProfile.birthDate = profile.birthDate
+        newProfile.phone = profile.phone
+        newProfile.description = profile.description
+        newProfile.registerDate = currentDateFormat
+        newProfile.photoUrl = profile.photoUrl
+        newProfile.type = if (profile.type == "Musician") "musician" else "organizer"
+        newProfile.user = userRepository.findById(userId)
                 .orElseThrow { throw IllegalArgumentException("User not found $userId") }
-        profile.district = districtRepository.findById(districtId)
+        newProfile.district = districtRepository.findById(districtId)
                 .orElseThrow { throw IllegalArgumentException("District not found $districtId") }
-        return profileRepository.save(profile)
+        return profileRepository.save(newProfile)
     }
 
     @Transactional

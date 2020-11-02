@@ -4,41 +4,41 @@ import com.get_your_music_5.locations.models.District
 import javax.persistence.*
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "profiles")
-class Profile(
+open class Profile(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id: Long=0,
+        open var id: Long=0,
 
         @Column(name = "first_name", nullable = false)
-        var firstName: String= "",
+        open var firstName: String = "",
 
         @Column(name = "last_name", nullable = false)
-        var lastName: String= "",
+        open var lastName: String= "",
 
         @Column(name = "birth_date", nullable = false)
-        var birthDate: String = "",
+        open var birthDate: String = "",
 
         @Column(name = "phone", nullable = false)
-        var phone: String = "",
+        open var phone: String = "",
 
         @Column(name = "description")
-        var description: String = "",
+        open var description: String = "",
 
         @Column(name = "register_date", nullable = false)
-        var registerDate: String = "",
+        open var registerDate: String = "",
 
         @Column(name = "photo_url")
-        var photoUrl: String = "",
+        open var photoUrl: String = "",
 
         @Column(name = "type", nullable = false)
-        var type: String = "",
+        open var type: String = "",
 
-        @OneToOne()
+        @OneToOne
         @JoinColumn(name = "user_id")
-        var user: User?= null,
+        open var user: User?= null,
 
-        @ManyToOne()
+        @ManyToOne
         @JoinColumn(name = "district_id")
-        var district: District?= null
-)
+        open var district: District?= null)
