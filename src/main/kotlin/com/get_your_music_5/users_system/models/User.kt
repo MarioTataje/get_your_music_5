@@ -12,5 +12,8 @@ class User(
         var email: String= "",
 
         @Column(name = "password", nullable = false)
-        var password: String= ""
+        var password: String= "",
+
+        @OneToOne(mappedBy = "user")
+        var profile: Profile? = null
 )
