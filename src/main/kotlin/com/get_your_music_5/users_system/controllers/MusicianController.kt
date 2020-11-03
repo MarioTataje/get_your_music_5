@@ -41,22 +41,22 @@ class MusicianController(
         return toResource(existed)
     }
 
-    @PostMapping("/musician/{musicianId}/genres/{genreId}")
+    @PostMapping("/musicians/{musicianId}/genres/{genreId}")
     fun addGenreToMusician(@PathVariable musicianId: Long, @PathVariable genreId: Long){
         musicianService.addGenreToMusician(musicianId, genreId)
     }
 
-    @DeleteMapping("/musician/{musicianId}/genres/{genreId}")
+    @DeleteMapping("/musicians/{musicianId}/genres/{genreId}")
     fun deleteGenreToMusician(@PathVariable musicianId: Long, @PathVariable genreId: Long){
         musicianService.deleteGenreToMusician(musicianId, genreId)
     }
 
-    @PostMapping("/musician/{musicianId}/instruments/{instrumentId}")
+    @PostMapping("/musicians/{musicianId}/instruments/{instrumentId}")
     fun addInstrumentToMusician(@PathVariable musicianId: Long, @PathVariable instrumentId: Long){
         musicianService.addInstrumentToMusician(musicianId, instrumentId)
     }
 
-    @DeleteMapping("/musician/{musicianId}/instruments/{instrumentId}")
+    @DeleteMapping("/musicians/{musicianId}/instruments/{instrumentId}")
     fun deleteInstrumentToMusician(@PathVariable musicianId: Long, @PathVariable instrumentId: Long){
         musicianService.deleteInstrumentToMusician(musicianId, instrumentId)
     }

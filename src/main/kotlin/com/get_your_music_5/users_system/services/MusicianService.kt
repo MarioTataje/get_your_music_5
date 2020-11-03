@@ -36,48 +36,48 @@ class MusicianService(
     fun addGenreToMusician(musicianId: Long, genreId: Long){
         val existedGenre = genreRepository.findById(genreId)
                 .orElseThrow { throw java.lang.IllegalArgumentException("Genre not found $genreId") }
-        musicianRepository.findById(musicianId).map{
-            if(!it.genres.contains(existedGenre)){
-                it.genres.add(existedGenre)
-                musicianRepository.save(it)
-            }
-        }.orElseThrow{ throw java.lang.IllegalArgumentException("Musician not found $musicianId") }
+        val existedMusician = musicianRepository.findById(musicianId)
+                .orElseThrow{ throw java.lang.IllegalArgumentException("Musician not found $musicianId") }
+        if(!existedMusician.genres.contains(existedGenre)) {
+            existedMusician.genres.add(existedGenre)
+            musicianRepository.save(existedMusician)
+        }
     }
 
     @Transactional
     fun deleteGenreToMusician(musicianId: Long, genreId: Long){
         val existedGenre = genreRepository.findById(genreId)
                 .orElseThrow { throw java.lang.IllegalArgumentException("Genre not found $genreId") }
-        musicianRepository.findById(musicianId).map {
-            if(it.genres.contains(existedGenre)){
-                it.genres.remove(existedGenre)
-                musicianRepository.save(it)
-            }
-        }.orElseThrow { throw java.lang.IllegalArgumentException("Musician not found $musicianId") }
+        val existedMusician = musicianRepository.findById(musicianId)
+                .orElseThrow { throw java.lang.IllegalArgumentException("Musician not found $musicianId") }
+        if(existedMusician.genres.contains(existedGenre)){
+            existedMusician.genres.remove(existedGenre)
+            musicianRepository.save(existedMusician)
+        }
     }
 
     @Transactional
     fun addInstrumentToMusician(musicianId: Long, instrumentId: Long){
         val existedInstrument = instrumentRepository.findById(instrumentId)
                 .orElseThrow { throw java.lang.IllegalArgumentException("Instrument not found $instrumentId") }
-        musicianRepository.findById(musicianId).map{
-            if(!it.instruments.contains(existedInstrument)){
-                it.instruments.add(existedInstrument)
-                musicianRepository.save(it)
-            }
-        }.orElseThrow{ throw java.lang.IllegalArgumentException("Musician not found $musicianId") }
+        val existedMusician = musicianRepository.findById(musicianId)
+                .orElseThrow{ throw java.lang.IllegalArgumentException("Musician not found $musicianId") }
+        if(!existedMusician.instruments.contains(existedInstrument)){
+            existedMusician.instruments.add(existedInstrument)
+            musicianRepository.save(existedMusician)
+        }
     }
 
     @Transactional
     fun deleteInstrumentToMusician(musicianId: Long, instrumentId: Long){
         val existedInstrument = instrumentRepository.findById(instrumentId)
                 .orElseThrow { throw java.lang.IllegalArgumentException("Instrument not found $instrumentId") }
-        musicianRepository.findById(musicianId).map {
-            if(it.instruments.contains(existedInstrument)){
-                it.instruments.remove(existedInstrument)
-                musicianRepository.save(it)
-            }
-        }.orElseThrow { throw java.lang.IllegalArgumentException("Musician not found $musicianId") }
+        val existedMusician = musicianRepository.findById(musicianId)
+                .orElseThrow { throw java.lang.IllegalArgumentException("Musician not found $musicianId") }
+        if(existedMusician.instruments.contains(existedInstrument)){
+            existedMusician.instruments.remove(existedInstrument)
+            musicianRepository.save(existedMusician)
+        }
     }
 
 }

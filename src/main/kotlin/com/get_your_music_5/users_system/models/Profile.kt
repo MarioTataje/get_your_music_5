@@ -1,6 +1,7 @@
 package com.get_your_music_5.users_system.models
 
 import com.get_your_music_5.locations.models.District
+import java.io.Serializable
 import javax.persistence.*
 
 @Entity
@@ -41,4 +42,4 @@ open class Profile(
 
         @ManyToOne
         @JoinColumn(name = "district_id")
-        open var district: District?= null)
+        open var district: District?= null): Serializable
