@@ -20,8 +20,6 @@ class ProfileService(
     private final val currentDate: LocalDateTime = LocalDateTime.now()
     val currentDateFormat: String = currentDate.format(DateTimeFormatter.ISO_DATE)
 
-
-
     fun getAll(): List<Profile> = profileRepository.findAll()
 
     fun getById(profileId: Long): Profile {

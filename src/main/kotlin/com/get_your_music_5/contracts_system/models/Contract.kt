@@ -3,6 +3,7 @@ package com.get_your_music_5.contracts_system.models
 import com.get_your_music_5.locations.models.District
 import com.get_your_music_5.users_system.models.Musician
 import com.get_your_music_5.users_system.models.Organizer
+import java.io.Serializable
 import javax.persistence.*
 
 @Entity
@@ -46,4 +47,4 @@ class Contract(
         @OneToOne(mappedBy = "contract")
         var qualification: Qualification? = null
 
-)
+): Serializable
