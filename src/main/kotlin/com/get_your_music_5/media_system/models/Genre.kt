@@ -1,5 +1,6 @@
 package com.get_your_music_5.media_system.models
 
+import com.get_your_music_5.users_system.models.Musician
 import javax.persistence.*
 
 @Entity
@@ -10,5 +11,8 @@ class Genre(
         var id: Long=0,
 
         @Column(name = "name", nullable = false)
-        var name: String = ""
+        var name: String = "",
+
+        @ManyToMany(mappedBy = "genres")
+        var musicians: MutableList<Musician> = mutableListOf()
 )

@@ -3,10 +3,7 @@ package com.get_your_music_5.users_system.controllers
 import com.get_your_music_5.users_system.models.Musician
 import com.get_your_music_5.users_system.resources.MusicianResource
 import com.get_your_music_5.users_system.services.MusicianService
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -20,6 +17,18 @@ class MusicianController(
         return toResourceList(musicians)
     }
 
+    @GetMapping("/genres/{genreId}/musicians")
+    fun getAllMusiciansByGenreId(@PathVariable genreId: Long): List<MusicianResource>{
+        val musicians = musicianService.getAllByGenreId(genreId)
+        return toResourceList(musicians)
+    }
+
+    @GetMapping("/instruments/{instrumentId}/musicians")
+    fun getAllMusiciansByInstrumentId(@PathVariable instrumentId: Long): List<MusicianResource>{
+        val musicians = musicianService.getAllByInstrumentId(instrumentId)
+        return toResourceList(musicians)
+    }
+
     @GetMapping("/districts/{districtId}/musicians")
     fun getAllMusiciansByDistrictId(@PathVariable districtId: Long): List<MusicianResource> {
         val musicians = musicianService.getAllByDistrictId(districtId)
@@ -30,6 +39,26 @@ class MusicianController(
     fun getMusicianById(@PathVariable musicianId: Long): MusicianResource {
         val existed = musicianService.getById(musicianId)
         return toResource(existed)
+    }
+
+    @PostMapping("/musician/{musicianId}/genres/{genreId}")
+    fun addGenreToMusician(@PathVariable musicianId: Long, @PathVariable genreId: Long){
+        musicianService.addGenreToMusician(musicianId, genreId)
+    }
+
+    @DeleteMapping("/musician/{musicianId}/genres/{genreId}")
+    fun deleteGenreToMusician(@PathVariable musicianId: Long, @PathVariable genreId: Long){
+        musicianService.deleteGenreToMusician(musicianId, genreId)
+    }
+
+    @PostMapping("/musician/{musicianId}/instruments/{instrumentId}")
+    fun addInstrumentToMusician(@PathVariable musicianId: Long, @PathVariable instrumentId: Long){
+        musicianService.addInstrumentToMusician(musicianId, instrumentId)
+    }
+
+    @DeleteMapping("/musician/{musicianId}/instruments/{instrumentId}")
+    fun deleteInstrumentToMusician(@PathVariable musicianId: Long, @PathVariable instrumentId: Long){
+        musicianService.deleteInstrumentToMusician(musicianId, instrumentId)
     }
 
     fun toResourceList(entities: List<Musician>) : List<MusicianResource>{

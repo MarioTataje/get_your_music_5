@@ -1,10 +1,10 @@
 package com.get_your_music_5.media_system.controllers
 
-
 import com.get_your_music_5.media_system.models.Instrument
 import com.get_your_music_5.media_system.resources.InstrumentResource
 import com.get_your_music_5.media_system.services.InstrumentService
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -16,6 +16,12 @@ class InstrumentController(
     @GetMapping("/instruments")
     fun getAllInstruments(): List<InstrumentResource> {
         val instruments = instrumentService.getAll()
+        return toResourceList(instruments)
+    }
+
+    @GetMapping("/musicians/{musicianId}/instruments")
+    fun getAllInstrumentsByMusicianId(@PathVariable musicianId: Long): List<InstrumentResource>{
+        val instruments = instrumentService.getAllByMusicianId(musicianId)
         return toResourceList(instruments)
     }
 
