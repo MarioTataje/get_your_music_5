@@ -10,7 +10,7 @@ data class SaveProfileResource (
         val type: String
 )
 
-class ProfileResource(
+open class ProfileResource(
         val id: Long?,
         val firstName: String,
         val lastName: String,

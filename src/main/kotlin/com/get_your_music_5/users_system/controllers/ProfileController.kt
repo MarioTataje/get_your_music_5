@@ -14,14 +14,8 @@ class ProfileController(
 ) {
 
     @GetMapping("/profiles")
-    fun getAllUsers(): List<ProfileResource> {
+    fun getAllProfiles(): List<ProfileResource> {
         val profiles = profileService.getAll()
-        return toResourceList(profiles)
-    }
-
-    @GetMapping("/districts/{districtId}/profiles")
-    fun getAllUsersByDistrictId(@PathVariable districtId: Long): List<ProfileResource> {
-        val profiles = profileService.getAllByDistrictId(districtId)
         return toResourceList(profiles)
     }
 

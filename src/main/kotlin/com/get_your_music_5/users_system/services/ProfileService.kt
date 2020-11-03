@@ -24,8 +24,6 @@ class ProfileService(
 
     fun getAll(): List<Profile> = profileRepository.findAll()
 
-    fun getAllByDistrictId(districtId: Long): List<Profile> = profileRepository.getByDistrictId(districtId)
-
     fun getById(profileId: Long): Profile {
         return profileRepository.findById(profileId)
                 .orElseThrow { throw IllegalArgumentException("Profile not found $profileId") }
