@@ -11,7 +11,7 @@ class RegionController(
         private val regionService: RegionService
 ) {
     @GetMapping("/regions")
-    fun getAllUsers(): List<RegionResource> {
+    fun getAllRegions(): List<RegionResource> {
         val regions = regionService.getAll()
         return toResourceList(regions)
     }
