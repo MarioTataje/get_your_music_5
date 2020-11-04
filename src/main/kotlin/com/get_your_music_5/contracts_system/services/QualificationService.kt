@@ -12,7 +12,7 @@ class QualificationService(
         private val contractRepository: ContractRepository
 ) {
 
-    fun getAllByMusicianId(musicianId:Long) = qualificationRepository.findAll()
+    fun getAllByMusicianId(musicianId:Long): List<Qualification> = qualificationRepository.getByMusicianId(musicianId)
 
     @Transactional
     fun save(qualification: Qualification, contractId: Long): Qualification{
