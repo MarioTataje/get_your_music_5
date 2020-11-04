@@ -22,7 +22,7 @@ class PublicationService(
 
     fun getById(publicationId: Long): Publication {
         return publicationRepository.findById(publicationId)
-                .orElseThrow { throw IllegalArgumentException("Publication not found $publicationRepository") }
+                .orElseThrow { throw IllegalArgumentException("Publication not found $publicationId") }
     }
 
     @Transactional
