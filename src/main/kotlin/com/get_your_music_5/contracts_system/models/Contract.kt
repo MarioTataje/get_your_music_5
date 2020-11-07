@@ -3,6 +3,8 @@ package com.get_your_music_5.contracts_system.models
 import com.get_your_music_5.locations.models.District
 import com.get_your_music_5.users_system.models.Musician
 import com.get_your_music_5.users_system.models.Organizer
+import com.get_your_music_5.users_system.patterns.Subject
+import com.get_your_music_5.users_system.patterns.Observer
 import java.io.Serializable
 import javax.persistence.*
 
@@ -47,4 +49,17 @@ class Contract(
         @OneToOne(mappedBy = "contract")
         var qualification: Qualification? = null
 
-): Serializable
+): Serializable, Subject {
+        @Transient
+        private val observersList: ArrayList<Observer> = ArrayList()
+
+        override fun addObserver(o: Observer) {
+                observersList.add(o)
+        }
+
+        override fun notifyObservers() {
+                for (observer in observersList) {
+                        observer.update(this)
+                }
+        }
+}

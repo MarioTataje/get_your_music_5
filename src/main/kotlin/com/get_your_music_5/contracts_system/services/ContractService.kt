@@ -4,6 +4,8 @@ import com.get_your_music_5.contracts_system.models.Contract
 import com.get_your_music_5.contracts_system.repositories.ContractRepository
 import com.get_your_music_5.contracts_system.repositories.ContractStateRepository
 import com.get_your_music_5.locations.repositories.DistrictRepository
+import com.get_your_music_5.media_system.repositories.NotificationRepository
+import com.get_your_music_5.users_system.patterns.ObserverImpl
 import com.get_your_music_5.users_system.repositories.MusicianRepository
 import com.get_your_music_5.users_system.repositories.OrganizerRepository
 import org.springframework.stereotype.Service
@@ -15,7 +17,8 @@ class ContractService(
         private val organizerRepository: OrganizerRepository,
         private val musicianRepository: MusicianRepository,
         private val districtRepository: DistrictRepository,
-        private val contractStateRepository: ContractStateRepository
+        private val contractStateRepository: ContractStateRepository,
+        private val notificationRepository: NotificationRepository
 ) {
     fun getAllByOrganizerId(organizerId: Long): List<Contract> = contractRepository.getByOrganizerId(organizerId)
 
@@ -36,6 +39,8 @@ class ContractService(
                 .orElseThrow { throw java.lang.IllegalArgumentException("District not found $districtId")}
         contract.state = contractStateRepository.findById(1)
                 .orElse(null)
+        contract.addObserver(ObserverImpl(notificationRepository))
+        contract.notifyObservers()
         return contractRepository.save(contract)
     }
 
@@ -45,6 +50,8 @@ class ContractService(
                 .orElseThrow { throw java.lang.IllegalArgumentException("Contract not found $contractId")}
         existed.state = contractStateRepository.findById(stateId)
                 .orElseThrow { throw java.lang.IllegalArgumentException("State not found $stateId")}
+        existed.addObserver(ObserverImpl(notificationRepository))
+        existed.notifyObservers()
         return contractRepository.save(existed)
     }
 }

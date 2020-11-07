@@ -1,7 +1,9 @@
 package com.get_your_music_5.social_system.services
 
+import com.get_your_music_5.media_system.repositories.NotificationRepository
 import com.get_your_music_5.social_system.models.Message
 import com.get_your_music_5.social_system.repositories.MessageRepository
+import com.get_your_music_5.users_system.patterns.ObserverImpl
 import com.get_your_music_5.users_system.repositories.ProfileRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -11,7 +13,8 @@ import java.time.format.DateTimeFormatter
 @Service
 class MessageService(
         private val messageRepository: MessageRepository,
-        private val profileRepository: ProfileRepository
+        private val profileRepository: ProfileRepository,
+        private val notificationRepository: NotificationRepository
 ) {
     private final val currentDate: LocalDateTime = LocalDateTime.now()
     val currentDateFormat: String = currentDate.format(DateTimeFormatter.ISO_DATE)
@@ -32,6 +35,8 @@ class MessageService(
                 .orElseThrow { throw IllegalArgumentException("Sender not found $senderId")}
         message.receiver = profileRepository.findById(receiverId)
                 .orElseThrow { throw IllegalArgumentException("Receiver not found $receiverId") }
+        message.addObserver(ObserverImpl(notificationRepository))
+        message.notifyObservers()
         return messageRepository.save(message)
     }
 }

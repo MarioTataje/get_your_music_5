@@ -1,6 +1,8 @@
 package com.get_your_music_5.social_system.models
 
 import com.get_your_music_5.users_system.models.Profile
+import com.get_your_music_5.users_system.patterns.Subject
+import com.get_your_music_5.users_system.patterns.Observer
 import javax.persistence.*
 
 @Entity
@@ -22,4 +24,17 @@ class Message(
 
         @ManyToOne
         @JoinColumn(name = "receiver_id", referencedColumnName = "id")
-        var receiver: Profile? = null)
+        var receiver: Profile? = null): Subject{
+        @Transient
+        private val observersList: ArrayList<Observer> = ArrayList()
+
+        override fun addObserver(o: Observer) {
+                observersList.add(o)
+        }
+
+        override fun notifyObservers() {
+                for (observer in observersList) {
+                        observer.update(this)
+                }
+        }
+}
