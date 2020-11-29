@@ -27,9 +27,8 @@ class MusicianService(
                 .orElseThrow{ throw java.lang.IllegalArgumentException("Instrument not found $instrumentId") }
     }
 
-    fun getById(musicianId: Long): Musician {
-        return musicianRepository.findById(musicianId)
-                .orElseThrow { throw IllegalArgumentException("Musician not found $musicianId") }
+    fun getById(musicianId: Long): Musician? {
+        return musicianRepository.findById(musicianId).orElse(null)
     }
 
     @Transactional

@@ -10,8 +10,7 @@ class OrganizerService(
 ) {
     fun getAll(): List<Organizer> = organizerRepository.findAll()
 
-    fun getById(organizerId: Long): Organizer {
-        return organizerRepository.findById(organizerId)
-                .orElseThrow { throw IllegalArgumentException("Organizer not found $organizerId") }
+    fun getById(organizerId: Long): Organizer? {
+        return organizerRepository.findById(organizerId).orElse(null)
     }
 }

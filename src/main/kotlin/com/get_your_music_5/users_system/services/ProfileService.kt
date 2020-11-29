@@ -22,9 +22,8 @@ class ProfileService(
 
     fun getAll(): List<Profile> = profileRepository.findAll()
 
-    fun getById(profileId: Long): Profile {
-        return profileRepository.findById(profileId)
-                .orElseThrow { throw IllegalArgumentException("Profile not found $profileId") }
+    fun getById(profileId: Long): Profile? {
+        return profileRepository.findById(profileId).orElse(null)
     }
 
     @Transactional
@@ -46,9 +45,8 @@ class ProfileService(
     }
 
     @Transactional
-    fun update(profileId: Long, profile: Profile): Profile {
-        val existed = profileRepository.findById(profileId).
-        orElseThrow { throw IllegalArgumentException("Profile not found $profileId") }
+    fun update(profileId: Long, profile: Profile): Profile? {
+        val existed = profileRepository.findById(profileId).orElse(null) ?: return null
         existed.firstName = profile.firstName
         existed.lastName = profile.lastName
         existed.birthDate = profile.birthDate
