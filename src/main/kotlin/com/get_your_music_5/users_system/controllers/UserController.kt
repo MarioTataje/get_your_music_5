@@ -16,7 +16,7 @@ class UserController(
     @GetMapping("/users/")
     fun getAllUsers(): ResponseEntity<List<UserResource>> {
         return try{
-            val users: List<User> = userService.getAll()
+            val users = userService.getAll()
             if (users.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
             ResponseEntity(toResourceList(users), HttpStatus.OK)

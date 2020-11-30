@@ -1,5 +1,8 @@
 package com.get_your_music_5.users_system.controllers
 
+import com.get_your_music_5.locations.services.DistrictService
+import com.get_your_music_5.media_system.services.GenreService
+import com.get_your_music_5.media_system.services.InstrumentService
 import com.get_your_music_5.users_system.models.Musician
 import com.get_your_music_5.users_system.resources.MusicianResource
 import com.get_your_music_5.users_system.services.MusicianService
@@ -11,9 +14,12 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api")
 class MusicianController(
-        private val musicianService: MusicianService
+        private val musicianService: MusicianService,
+        private val districtService: DistrictService,
+        private val genreService: GenreService,
+        private val instrumentService: InstrumentService
 ){
-    @GetMapping("/musicians")
+    @GetMapping("/musicians/")
     fun getAllMusicians(): ResponseEntity<List<MusicianResource>> {
         return try{
             val musicians: List<Musician> = musicianService.getAll()
@@ -25,33 +31,34 @@ class MusicianController(
         }
     }
 
-    @GetMapping("/genres/{genreId}/musicians")
-    fun getAllMusiciansByGenreId(@PathVariable genreId: Long): ResponseEntity<List<MusicianResource>>{
+    @GetMapping("/genres/{genreId}/musicians/")
+    fun getAllMusiciansByGenre(@PathVariable genreId: Long): ResponseEntity<List<MusicianResource>>{
         return try{
-            val musicians = musicianService.getAllByGenreId(genreId)
-            if (musicians.isEmpty())
-                return ResponseEntity(HttpStatus.NO_CONTENT)
+            val genre = genreService.getById(genreId)?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val musicians = musicianService.getAllByGenre(genre)
+            if (musicians.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
             ResponseEntity(toResourceList(musicians), HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    @GetMapping("/instruments/{instrumentId}/musicians")
-    fun getAllMusiciansByInstrumentId(@PathVariable instrumentId: Long): ResponseEntity<List<MusicianResource>>{
+    @GetMapping("/instruments/{instrumentId}/musicians/")
+    fun getAllMusiciansByInstrument(@PathVariable instrumentId: Long): ResponseEntity<List<MusicianResource>>{
         return try{
-            val musicians = musicianService.getAllByInstrumentId(instrumentId)
-            if (musicians.isEmpty())
-                return ResponseEntity(HttpStatus.NO_CONTENT)
+            val instrument = instrumentService.getById(instrumentId)?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val musicians = musicianService.getAllByInstrument(instrument)
+            if (musicians.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
             ResponseEntity(toResourceList(musicians), HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    @GetMapping("/districts/{districtId}/musicians")
+    @GetMapping("/districts/{districtId}/musicians/")
     fun getAllMusiciansByDistrictId(@PathVariable districtId: Long): ResponseEntity<List<MusicianResource>> {
         return try{
+            districtService.getById(districtId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
             val musicians = musicianService.getAllByDistrictId(districtId)
             if (musicians.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
@@ -61,7 +68,7 @@ class MusicianController(
         }
     }
 
-    @GetMapping("/musicians/{musicianId}")
+    @GetMapping("/musicians/{musicianId}/")
     fun getMusicianById(@PathVariable musicianId: Long): ResponseEntity<MusicianResource> {
         return try{
             val existed = musicianService.getById(musicianId)
@@ -72,30 +79,54 @@ class MusicianController(
         }
     }
 
-    @PostMapping("/musicians/{musicianId}/genres/{genreId}")
+    @PostMapping("/musicians/{musicianId}/genres/{genreId}/")
     fun addGenreToMusician(@PathVariable musicianId: Long, @PathVariable genreId: Long): ResponseEntity<*>{
-        musicianService.addGenreToMusician(musicianId, genreId)
-        return ResponseEntity<Any>(HttpStatus.ACCEPTED)
+        return try{
+            val genre = genreService.getById(genreId) ?: return ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+            val musician = musicianService.getById(musicianId)?: return ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+            musicianService.addGenreToMusician(musician, genre)
+            return ResponseEntity<Any>(HttpStatus.ACCEPTED)
+        } catch (e: Exception){
+            ResponseEntity<Any>(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
-    @DeleteMapping("/musicians/{musicianId}/genres/{genreId}")
+    @DeleteMapping("/musicians/{musicianId}/genres/{genreId}/")
     fun deleteGenreToMusician(@PathVariable musicianId: Long, @PathVariable genreId: Long): ResponseEntity<*>{
-        musicianService.deleteGenreToMusician(musicianId, genreId)
-        return ResponseEntity<Any>(HttpStatus.NO_CONTENT)
+        return try{
+            val genre = genreService.getById(genreId) ?: return ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+            val musician = musicianService.getById(musicianId)?: return ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+            musicianService.deleteGenreToMusician(musician, genre)
+            return ResponseEntity<Any>(HttpStatus.ACCEPTED)
+        } catch (e: Exception){
+            ResponseEntity<Any>(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
-    @PostMapping("/musicians/{musicianId}/instruments/{instrumentId}")
+    @PostMapping("/musicians/{musicianId}/instruments/{instrumentId}/")
     fun addInstrumentToMusician(@PathVariable musicianId: Long, @PathVariable instrumentId: Long)
             : ResponseEntity<*>{
-        musicianService.addInstrumentToMusician(musicianId, instrumentId)
-        return ResponseEntity<Any>(HttpStatus.ACCEPTED)
+        return try{
+            val instrument = instrumentService.getById(instrumentId) ?: return ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+            val musician = musicianService.getById(musicianId)?: return ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+            musicianService.addInstrumentToMusician(musician, instrument)
+            return ResponseEntity<Any>(HttpStatus.ACCEPTED)
+        } catch (e: Exception){
+            ResponseEntity<Any>(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
-    @DeleteMapping("/musicians/{musicianId}/instruments/{instrumentId}")
+    @DeleteMapping("/musicians/{musicianId}/instruments/{instrumentId}/")
     fun deleteInstrumentToMusician(@PathVariable musicianId: Long, @PathVariable instrumentId: Long):
             ResponseEntity<*>{
-        musicianService.deleteInstrumentToMusician(musicianId, instrumentId)
-        return ResponseEntity<Any>(HttpStatus.NO_CONTENT)
+        return try{
+            val instrument = instrumentService.getById(instrumentId) ?: return ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+            val musician = musicianService.getById(musicianId)?: return ResponseEntity<Any>(HttpStatus.NOT_FOUND)
+            musicianService.deleteInstrumentToMusician(musician, instrument)
+            return ResponseEntity<Any>(HttpStatus.ACCEPTED)
+        } catch (e: Exception){
+            ResponseEntity<Any>(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     fun toResourceList(entities: List<Musician>) : List<MusicianResource>{

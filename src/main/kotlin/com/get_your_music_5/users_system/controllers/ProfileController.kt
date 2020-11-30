@@ -1,9 +1,11 @@
 package com.get_your_music_5.users_system.controllers
 
+import com.get_your_music_5.locations.services.DistrictService
 import com.get_your_music_5.users_system.models.Profile
 import com.get_your_music_5.users_system.resources.ProfileResource
 import com.get_your_music_5.users_system.resources.SaveProfileResource
 import com.get_your_music_5.users_system.services.ProfileService
+import com.get_your_music_5.users_system.services.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -12,13 +14,15 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api")
 class ProfileController(
-        private val profileService: ProfileService
+        private val profileService: ProfileService,
+        private val userService: UserService,
+        private val districtService: DistrictService
 ) {
 
-    @GetMapping("/profiles")
+    @GetMapping("/profiles/")
     fun getAllProfiles(): ResponseEntity<List<ProfileResource>> {
         return try{
-            val profiles: List<Profile> = profileService.getAll()
+            val profiles = profileService.getAll()
             if (profiles.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
             ResponseEntity(toResourceList(profiles), HttpStatus.OK)
@@ -27,7 +31,7 @@ class ProfileController(
         }
     }
 
-    @GetMapping("/profiles/{profileId}")
+    @GetMapping("/profiles/{profileId}/")
     fun getProfileById(@PathVariable profileId: Long): ResponseEntity<ProfileResource> {
         return try{
             val existed = profileService.getById(profileId)
@@ -42,14 +46,16 @@ class ProfileController(
     fun create(@RequestBody profile: SaveProfileResource, @PathVariable userId: Long,
                @PathVariable districtId: Long) : ResponseEntity<ProfileResource> {
         return try{
-            val newProfile = profileService.save(toEntity(profile), userId, districtId)
+            val user = userService.getById(userId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val district = districtService.getById(districtId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val newProfile = profileService.save(toEntity(profile), user, district)
             ResponseEntity(toResource(newProfile), HttpStatus.CREATED)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    @PutMapping("/profiles/{profileId}")
+    @PutMapping("/profiles/{profileId}/")
     fun update(@PathVariable profileId: Long, @RequestBody profile: SaveProfileResource):
             ResponseEntity<ProfileResource> {
         return try{

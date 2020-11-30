@@ -3,6 +3,7 @@ package com.get_your_music_5.locations.controllers
 import com.get_your_music_5.locations.models.District
 import com.get_your_music_5.locations.resources.DistrictResource
 import com.get_your_music_5.locations.services.DistrictService
+import com.get_your_music_5.locations.services.ProvinceService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,11 +14,13 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api")
 class DistrictController(
-        private val districtService: DistrictService
+        private val districtService: DistrictService,
+        private val provinceService: ProvinceService
 ) {
     @GetMapping("/provinces/{provinceId}/districts/")
     fun getAllDistrictsByProvinceId(@PathVariable provinceId: Long): ResponseEntity<List<DistrictResource>> {
         return try {
+            provinceService.getById(provinceId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
             val districts: List<District> = districtService.getAllByProvinceId(provinceId)
             if (districts.isEmpty()) {
                 return ResponseEntity(HttpStatus.NO_CONTENT)

@@ -14,10 +14,7 @@ class UserService(
 ) {
     fun getAll(): List<User> = userRepository.findAll()
 
-    fun getById(userId: Long): User? {
-        return userRepository.findById(userId)
-                .orElseThrow { throw IllegalArgumentException("User not found $userId") }
-    }
+    fun getById(userId: Long): User? = userRepository.findById(userId).orElse(null)
 
     @Transactional
     fun save(user: User): User {

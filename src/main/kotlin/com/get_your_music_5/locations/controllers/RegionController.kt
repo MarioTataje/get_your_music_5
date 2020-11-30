@@ -17,7 +17,7 @@ class RegionController(
     @GetMapping("/regions/")
     fun getAllRegions(): ResponseEntity<List<RegionResource>> {
         return try {
-            val regions: List<Region> = regionService.getAll()
+            val regions = regionService.getAll()
             if (regions.isEmpty()) {
                 return ResponseEntity(HttpStatus.NO_CONTENT)
             }

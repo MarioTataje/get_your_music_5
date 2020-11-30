@@ -9,4 +9,6 @@ class DistrictService(
         private val districtRepository: DistrictRepository
 ) {
     fun getAllByProvinceId(provinceId: Long): List<District> = districtRepository.getByProvinceId(provinceId)
+
+    fun getById(id: Long): District? = districtRepository.findById(id).orElse(null)
 }

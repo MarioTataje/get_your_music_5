@@ -8,5 +8,7 @@ import org.springframework.stereotype.Service
 class ProvinceService(
         private val provinceRepository: ProvinceRepository
 ) {
-    fun getAllByRegionId(provinceId: Long): List<Province> = provinceRepository.getByRegionId(provinceId)
+    fun getAllByRegionId(regionId: Long): List<Province> = provinceRepository.getByRegionId(regionId)
+
+    fun getById(id: Long): Province? = provinceRepository.findById(id).orElse(null)
 }

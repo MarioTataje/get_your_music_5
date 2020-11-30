@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 class OrganizerController(
         private val organizerService: OrganizerService
 ) {
-    @GetMapping("/organizers")
+    @GetMapping("/organizers/")
     fun getAllOrganizers(): ResponseEntity<List<OrganizerResource>> {
         return try{
             val organizers: List<Organizer> = organizerService.getAll()
@@ -27,7 +27,7 @@ class OrganizerController(
         }
     }
 
-    @GetMapping("/organizers/{organizerId}")
+    @GetMapping("/organizers/{organizerId}/")
     fun getOrganizerById(@PathVariable organizerId: Long): ResponseEntity<OrganizerResource> {
         return try{
             val existed = organizerService.getById(organizerId)
