@@ -59,9 +59,9 @@ class ProfileController(
     fun update(@PathVariable profileId: Long, @RequestBody profile: SaveProfileResource):
             ResponseEntity<ProfileResource> {
         return try{
-            val existed = profileService.update(profileId, toEntity(profile))
-            return if (existed != null) ResponseEntity(toResource(existed), HttpStatus.OK)
-            else ResponseEntity(HttpStatus.NOT_FOUND)
+            val existed = profileService.getById(profileId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val updated = profileService.update(existed, toEntity(profile))
+            ResponseEntity(toResource(updated), HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }

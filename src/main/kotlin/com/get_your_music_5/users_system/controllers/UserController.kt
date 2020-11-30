@@ -39,9 +39,9 @@ class UserController(
     @PutMapping("/users/{userId}/")
     fun update(@PathVariable userId: Long, @RequestBody user: SaveUserResource): ResponseEntity<UserResource> {
         return try{
-            val existed = userService.update(userId, toEntity(user))
-            return if (existed != null) ResponseEntity(toResource(existed), HttpStatus.OK)
-            else ResponseEntity(HttpStatus.NOT_FOUND)
+            val existed = userService.getById(userId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val updated = userService.update(existed, toEntity(user))
+            ResponseEntity(toResource(updated), HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }

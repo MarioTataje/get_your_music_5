@@ -27,8 +27,7 @@ class UserService(
     }
 
     @Transactional
-    fun update(userId: Long, user: User): User? {
-        val existed = userRepository.findById(userId).orElse(null) ?: return null
+    fun update(existed: User, user: User): User {
         existed.email = user.email
         return userRepository.save(existed)
     }

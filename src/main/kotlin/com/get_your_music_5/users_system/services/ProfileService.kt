@@ -41,8 +41,7 @@ class ProfileService(
     }
 
     @Transactional
-    fun update(profileId: Long, profile: Profile): Profile? {
-        val existed = profileRepository.findById(profileId).orElse(null) ?: return null
+    fun update(existed: Profile, profile: Profile): Profile {
         existed.firstName = profile.firstName
         existed.lastName = profile.lastName
         existed.birthDate = profile.birthDate

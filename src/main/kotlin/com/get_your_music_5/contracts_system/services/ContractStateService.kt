@@ -9,4 +9,6 @@ class ContractStateService(
         private val contractStateRepository: ContractStateRepository
 ) {
     fun getAll(): List<ContractState> = contractStateRepository.findAll()
+
+    fun getById(id: Long): ContractState? = contractStateRepository.findById(id).orElse(null)
 }
