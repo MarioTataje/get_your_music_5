@@ -3,36 +3,66 @@ package com.get_your_music_5.social_system.controllers
 import com.get_your_music_5.social_system.models.Message
 import com.get_your_music_5.social_system.resources.*
 import com.get_your_music_5.social_system.services.MessageService
+import com.get_your_music_5.users_system.services.ProfileService
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/")
 class MessageController(
-        private val messageService: MessageService
+        private val messageService: MessageService,
+        private val profileService: ProfileService
 ) {
+
     @GetMapping("/senders/{senderId}/messages")
-    fun getAllMessagesSenderById(@PathVariable senderId: Long): List<MessageResource>{
-        val messages = messageService.getAllBySenderId(senderId)
-        return toResourceList(messages)
+    fun getAllMessagesSenderById(@PathVariable senderId: Long): ResponseEntity<List<MessageResource>>{
+        return try{
+            profileService.getById(senderId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val messages = messageService.getAllBySenderId(senderId)
+            if (messages.isEmpty())
+                return ResponseEntity(HttpStatus.NO_CONTENT)
+            ResponseEntity(toResourceList(messages), HttpStatus.OK)
+        } catch (e: Exception){
+            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     @GetMapping("/receivers/{receiverId}/messages")
-    fun getAllMessagesReceiverById(@PathVariable receiverId: Long): List<MessageResource>{
-        val messages = messageService.getAllByReceiverId(receiverId)
-        return toResourceList(messages)
+    fun getAllMessagesReceiverById(@PathVariable receiverId: Long): ResponseEntity<List<MessageResource>>{
+        return try{
+            profileService.getById(receiverId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val messages = messageService.getAllByReceiverId(receiverId)
+            if (messages.isEmpty())
+                return ResponseEntity(HttpStatus.NO_CONTENT)
+            ResponseEntity(toResourceList(messages), HttpStatus.OK)
+        } catch (e: Exception){
+            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
-    @GetMapping("/messages/{messageId}")
-    fun getMessageById(@PathVariable messageId: Long): MessageResource {
-        val existed = messageService.getById(messageId)
-        return toResource(existed)
+    @GetMapping("/messages/{messageId}/")
+    fun getMessageById(@PathVariable messageId: Long): ResponseEntity<MessageResource> {
+        return try{
+            val existed = messageService.getById(messageId)
+            return if (existed != null) ResponseEntity(toResource(existed), HttpStatus.OK)
+            else ResponseEntity(HttpStatus.NOT_FOUND)
+        } catch (e: Exception){
+            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     @PostMapping("/senders/{senderId}/receivers/{receiverId}/messages")
     fun create(@RequestBody message: SaveMessageResource, @PathVariable senderId: Long,
-               @PathVariable receiverId: Long): MessageResource{
-        val newMessage = messageService.save(toEntity(message), senderId, receiverId)
-        return toResource(newMessage)
+               @PathVariable receiverId: Long): ResponseEntity<MessageResource>{
+        return try{
+            val sender = profileService.getById(senderId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val receiver =  profileService.getById(receiverId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
+            val newMessage = messageService.save(toEntity(message), sender, receiver)
+            ResponseEntity(toResource(newMessage), HttpStatus.OK)
+        } catch (e: Exception){
+            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+        }
     }
 
     fun toEntity(resource: SaveMessageResource) = Message(

@@ -22,7 +22,7 @@ class ContractController(
         private val districtService: DistrictService
 ) {
 
-    @GetMapping("/organizers/{organizerId}/contracts")
+    @GetMapping("/organizers/{organizerId}/contracts/")
     fun getAllContractsByOrganizerId(@PathVariable organizerId: Long): ResponseEntity<List<ContractResource>> {
         return try{
             organizerService.getById(organizerId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
@@ -35,7 +35,7 @@ class ContractController(
         }
     }
 
-    @GetMapping("/musicians/{musicianId}/contracts")
+    @GetMapping("/musicians/{musicianId}/contracts/")
     fun getAllContractsByMusicianId(@PathVariable musicianId: Long): ResponseEntity<List<ContractResource>> {
         return try{
             musicianService.getById(musicianId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
@@ -48,7 +48,7 @@ class ContractController(
         }
     }
 
-    @GetMapping("/contracts/{contractId}")
+    @GetMapping("/contracts/{contractId}/")
     fun getContractById(@PathVariable contractId: Long): ResponseEntity<ContractResource> {
         return try{
             val existed = contractService.getById(contractId)
@@ -59,7 +59,7 @@ class ContractController(
         }
     }
 
-    @PostMapping("/organizers/{organizerId}/musicians/{musicianId}/districts/{districtId}/contracts")
+    @PostMapping("/organizers/{organizerId}/musicians/{musicianId}/districts/{districtId}/contracts/")
     fun create(@RequestBody contract: SaveContractResource, @PathVariable organizerId: Long,
                @PathVariable musicianId: Long, @PathVariable districtId: Long) : ResponseEntity<ContractResource> {
         return try{
@@ -74,7 +74,7 @@ class ContractController(
         }
     }
 
-    @PutMapping("/contracts/{contractId}/states/{stateId}")
+    @PutMapping("/contracts/{contractId}/states/{stateId}/")
     fun updateState(@PathVariable contractId: Long, @PathVariable stateId: Long): ResponseEntity<ContractResource>{
         return try{
             val state = contractStateService.getById(stateId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)

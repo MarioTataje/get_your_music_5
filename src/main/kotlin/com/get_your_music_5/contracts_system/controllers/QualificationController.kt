@@ -18,7 +18,7 @@ class QualificationController(
         private val musicianService: MusicianService
 ) {
 
-    @GetMapping("musicians/{musicianId}/qualifications")
+    @GetMapping("musicians/{musicianId}/qualifications/")
     fun getAllQualificationsByMusicianId(@PathVariable musicianId: Long): ResponseEntity<List<QualificationResource>>{
         return try{
             musicianService.getById(musicianId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
@@ -31,7 +31,7 @@ class QualificationController(
         }
     }
 
-    @PostMapping("contracts/{contractId}/qualifications")
+    @PostMapping("contracts/{contractId}/qualifications/")
     fun create(@RequestBody qualification: SaveQualificationResource, @PathVariable contractId: Long)
             : ResponseEntity<QualificationResource> {
         return try{
