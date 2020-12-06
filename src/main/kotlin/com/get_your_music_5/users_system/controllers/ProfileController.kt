@@ -25,7 +25,7 @@ class ProfileController(
             val profiles = profileService.getAll()
             if (profiles.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(profiles), HttpStatus.OK)
+            ResponseEntity(profiles.map{profile -> this.toResource(profile)  }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -76,27 +76,6 @@ class ProfileController(
             photoUrl = resource.photoUrl,
             type = resource.type
     )
-
-    fun toResourceList(entities: List<Profile>) : List<ProfileResource>{
-        val resources = mutableListOf<ProfileResource>()
-        for(entity in entities){
-            val resource = ProfileResource(
-                    id = entity.id,
-                    firstName = entity.firstName,
-                    lastName = entity.lastName,
-                    birthDate = entity.birthDate,
-                    phone = entity.phone,
-                    description = entity.description,
-                    registerDate = entity.registerDate,
-                    photoUrl = entity.photoUrl,
-                    type = entity.type,
-                    userEmail = entity.user?.email,
-                    districtName = entity.district?.name
-            )
-            resources.add(resource)
-        }
-        return resources
-    }
 
     fun toResource(entity: Profile) = ProfileResource(
             id = entity.id,

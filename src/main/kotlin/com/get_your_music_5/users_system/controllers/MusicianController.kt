@@ -25,7 +25,7 @@ class MusicianController(
             val musicians: List<Musician> = musicianService.getAll()
             if (musicians.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(musicians), HttpStatus.OK)
+            ResponseEntity(musicians.map { musician -> this.toResource(musician) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -37,7 +37,7 @@ class MusicianController(
             val genre = genreService.getById(genreId)?: return ResponseEntity(HttpStatus.NOT_FOUND)
             val musicians = musicianService.getAllByGenre(genre)
             if (musicians.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(musicians), HttpStatus.OK)
+            ResponseEntity(musicians.map { musician -> this.toResource(musician) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -49,7 +49,7 @@ class MusicianController(
             val instrument = instrumentService.getById(instrumentId)?: return ResponseEntity(HttpStatus.NOT_FOUND)
             val musicians = musicianService.getAllByInstrument(instrument)
             if (musicians.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(musicians), HttpStatus.OK)
+            ResponseEntity(musicians.map { musician -> this.toResource(musician) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -62,7 +62,7 @@ class MusicianController(
             val musicians = musicianService.getAllByDistrictId(districtId)
             if (musicians.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(musicians), HttpStatus.OK)
+            ResponseEntity(musicians.map { musician -> this.toResource(musician) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -127,28 +127,6 @@ class MusicianController(
         } catch (e: Exception){
             ResponseEntity<Any>(HttpStatus.INTERNAL_SERVER_ERROR)
         }
-    }
-
-    fun toResourceList(entities: List<Musician>) : List<MusicianResource>{
-        val resources = mutableListOf<MusicianResource>()
-        for(entity in entities){
-            val resource = MusicianResource(
-                    id = entity.id,
-                    firstName = entity.firstName,
-                    lastName = entity.lastName,
-                    birthDate = entity.birthDate,
-                    phone = entity.phone,
-                    description = entity.description,
-                    registerDate = entity.registerDate,
-                    photoUrl = entity.photoUrl,
-                    type = entity.type,
-                    userEmail = entity.user?.email,
-                    districtName = entity.district?.name,
-                    rating = entity.rating
-            )
-            resources.add(resource)
-        }
-        return resources
     }
 
     fun toResource(entity: Musician) = MusicianResource(

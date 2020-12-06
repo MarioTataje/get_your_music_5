@@ -20,18 +20,15 @@ class NotificationController(
             profileService.getById(profileId)?: return ResponseEntity(HttpStatus.NOT_FOUND)
             val notifications = notificationService.getAllByProfileId(profileId)
             if (notifications.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(notifications), HttpStatus.OK)
+            ResponseEntity(notifications.map { notification -> this.toResource(notification) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    fun toResourceList(entities: List<Notification>) : List<NotificationResource>{
-        val resources = mutableListOf<NotificationResource>()
-        for(entity in entities){
-            val resource = NotificationResource(entity.id, entity.message, entity.profile?.firstName)
-            resources.add(resource)
-        }
-        return resources
-    }
+    fun toResource(entity: Notification) = NotificationResource(
+            id = entity.id,
+            message = entity.message,
+            profileName = entity.profile?.firstName
+    )
 }

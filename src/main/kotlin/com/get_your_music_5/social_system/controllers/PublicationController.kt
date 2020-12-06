@@ -22,7 +22,7 @@ class PublicationController(
             val publications = publicationService.getAll()
             if (publications.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(publications), HttpStatus.OK)
+            ResponseEntity(publications.map{ publication -> this.toResource(publication)  }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -35,7 +35,7 @@ class PublicationController(
             val publications = publicationService.getAllByMusicianId(musicianId)
             if (publications.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(publications), HttpStatus.OK)
+            ResponseEntity(publications.map{ publication -> this.toResource(publication)  }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -80,21 +80,6 @@ class PublicationController(
             videoUrl = resource.videoUrl,
             content = resource.content
     )
-
-    fun toResourceList(entities: List<Publication>) : List<PublicationResource>{
-        val resources = mutableListOf<PublicationResource>()
-        for(entity in entities){
-            val resource = PublicationResource(
-                    id = entity.id,
-                    videoUrl = entity.videoUrl,
-                    content = entity.content,
-                    publishDate = entity.publishDate,
-                    musicianName = entity.musician?.firstName
-            )
-            resources.add(resource)
-        }
-        return resources
-    }
 
     fun toResource(entity: Publication) = PublicationResource(
             id = entity.id,

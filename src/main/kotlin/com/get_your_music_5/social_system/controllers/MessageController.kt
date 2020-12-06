@@ -22,7 +22,7 @@ class MessageController(
             val messages = messageService.getAllBySenderId(senderId)
             if (messages.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(messages), HttpStatus.OK)
+            ResponseEntity(messages.map { message -> this.toResource(message) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -35,7 +35,7 @@ class MessageController(
             val messages = messageService.getAllByReceiverId(receiverId)
             if (messages.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(messages), HttpStatus.OK)
+            ResponseEntity(messages.map { message -> this.toResource(message) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -68,21 +68,6 @@ class MessageController(
     fun toEntity(resource: SaveMessageResource) = Message(
             text = resource.text
     )
-
-    fun toResourceList(entities: List<Message>) : List<MessageResource>{
-        val resources = mutableListOf<MessageResource>()
-        for(entity in entities){
-            val resource = MessageResource(
-                    id = entity.id,
-                    text = entity.text,
-                    sendDate = entity.sendDate,
-                    senderName = entity.sender?.firstName,
-                    receiverName = entity.receiver?.firstName
-            )
-            resources.add(resource)
-        }
-        return resources
-    }
 
     fun toResource(entity: Message) = MessageResource(
             id = entity.id,

@@ -17,21 +17,17 @@ class ContractStateController(
     @GetMapping("/contractStates/")
     fun getAllContractStates(): ResponseEntity<List<ContractStateResource>> {
         return try{
-            val contractState = contractStateService.getAll()
-            if (contractState.isEmpty())
+            val contractStates = contractStateService.getAll()
+            if (contractStates.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(contractState), HttpStatus.OK)
+            ResponseEntity(contractStates.map { contractState -> this.toResource(contractState) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
 }
 
-    fun toResourceList(entities: List<ContractState>) : List<ContractStateResource>{
-        val resources = mutableListOf<ContractStateResource>()
-        for(entity in entities){
-            val resource = ContractStateResource(entity.id, entity.name)
-            resources.add(resource)
-        }
-        return resources
-    }
+    fun toResource(entity: ContractState) = ContractStateResource(
+            id = entity.id,
+            state = entity.name
+    )
 }

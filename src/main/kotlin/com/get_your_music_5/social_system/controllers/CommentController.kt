@@ -25,7 +25,7 @@ class CommentController(
             val comments = commentService.getAllByPublicationId(publicationId)
             if (comments.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(comments), HttpStatus.OK)
+            ResponseEntity(comments.map { comment -> this.toResource(comment) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -47,20 +47,6 @@ class CommentController(
     fun toEntity(resource: SaveCommentResource) = Comment(
             text = resource.text
     )
-
-    fun toResourceList(entities: List<Comment>) : List<CommentResource>{
-        val resources = mutableListOf<CommentResource>()
-        for(entity in entities){
-            val resource = CommentResource(
-                    id = entity.id,
-                    text = entity.text,
-                    commenterName = entity.commenter?.firstName,
-                    publicationContent = entity.publication?.content
-            )
-            resources.add(resource)
-        }
-        return resources
-    }
 
     fun toResource(entity: Comment) = CommentResource(
             id = entity.id,

@@ -23,7 +23,7 @@ class InstrumentController(
             val instruments = instrumentService.getAll()
             if (instruments.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(instruments), HttpStatus.OK)
+            ResponseEntity(instruments.map { instrument -> this.toResource(instrument) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -35,18 +35,14 @@ class InstrumentController(
             val musician = musicianService.getById(musicianId)?: return ResponseEntity(HttpStatus.NOT_FOUND)
             val instruments = instrumentService.getAllByMusician(musician)
             if (instruments.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(instruments), HttpStatus.OK)
+            ResponseEntity(instruments.map { instrument -> this.toResource(instrument) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    fun toResourceList(entities: List<Instrument>) : List<InstrumentResource>{
-        val resources = mutableListOf<InstrumentResource>()
-        for(entity in entities){
-            val resource = InstrumentResource(entity.id, entity.name)
-            resources.add(resource)
-        }
-        return resources
-    }
+    fun toResource(entity: Instrument)= InstrumentResource(
+            id = entity.id,
+            name = entity.name
+    )
 }

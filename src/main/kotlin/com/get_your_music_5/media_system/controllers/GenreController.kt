@@ -23,7 +23,7 @@ class GenreController(
             val genres = genreService.getAll()
             if (genres.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(genres), HttpStatus.OK)
+            ResponseEntity(genres.map { genre -> this.toResource(genre) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -35,18 +35,14 @@ class GenreController(
             val musician = musicianService.getById(musicianId)?: return ResponseEntity(HttpStatus.NOT_FOUND)
             val genres = genreService.getAllByMusician(musician)
             if (genres.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(genres), HttpStatus.OK)
+            ResponseEntity(genres.map { genre -> this.toResource(genre) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    fun toResourceList(entities: List<Genre>) : List<GenreResource>{
-        val resources = mutableListOf<GenreResource>()
-        for(entity in entities){
-            val resource = GenreResource(entity.id, entity.name)
-            resources.add(resource)
-        }
-        return resources
-    }
+    fun toResource(entity: Genre) = GenreResource(
+            id = entity.id,
+            name = entity.name
+    )
 }

@@ -25,7 +25,7 @@ class QualificationController(
             val qualifications = qualificationService.getAllByMusicianId(musicianId)
             if (qualifications.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(qualifications), HttpStatus.OK)
+            ResponseEntity(qualifications.map { qualification -> this.toResource(qualification) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -47,20 +47,6 @@ class QualificationController(
             text = resource.text,
             score = resource.score
     )
-
-    fun toResourceList(entities: List<Qualification>) : List<QualificationResource>{
-        val resources = mutableListOf<QualificationResource>()
-        for(entity in entities){
-            val resource = QualificationResource(
-                    id = entity.id,
-                    text = entity.text,
-                    score = entity.score,
-                    organizerName = entity.contract?.organizer?.firstName
-            )
-            resources.add(resource)
-        }
-        return resources
-    }
 
     fun toResource(entity: Qualification) = QualificationResource(
             id = entity.id,

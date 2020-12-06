@@ -22,7 +22,7 @@ class FollowingController(
             val followings = followingService.getAllByFollowerId(followerId)
             if (followings.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(followings), HttpStatus.OK)
+            ResponseEntity(followings.map { following -> this.toResource(following) } , HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -35,7 +35,7 @@ class FollowingController(
             val followings = followingService.getAllByFollowedId(followedId)
             if (followings.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(followings), HttpStatus.OK)
+            ResponseEntity(followings.map { following -> this.toResource(following) } , HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -63,19 +63,6 @@ class FollowingController(
         } catch (e: Exception){
             ResponseEntity<Any>(HttpStatus.INTERNAL_SERVER_ERROR)
         }
-    }
-
-    fun toResourceList(entities: List<Following>) : List<FollowingResource>{
-        val resources = mutableListOf<FollowingResource>()
-        for(entity in entities){
-            val resource = FollowingResource(
-                    followerName = entity.follower?.firstName,
-                    followedName = entity.followed?.firstName,
-                    followDate = entity.followDate
-            )
-            resources.add(resource)
-        }
-        return resources
     }
 
     fun toResource(entity: Following?) = FollowingResource(

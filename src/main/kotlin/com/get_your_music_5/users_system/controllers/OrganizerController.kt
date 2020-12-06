@@ -21,7 +21,7 @@ class OrganizerController(
             val organizers: List<Organizer> = organizerService.getAll()
             if (organizers.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(organizers), HttpStatus.OK)
+            ResponseEntity(organizers.map { organizer -> this.toResource(organizer) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -36,27 +36,6 @@ class OrganizerController(
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
-    }
-
-    fun toResourceList(entities: List<Organizer>) : List<OrganizerResource>{
-        val resources = mutableListOf<OrganizerResource>()
-        for(entity in entities){
-            val resource = OrganizerResource(
-                    id = entity.id,
-                    firstName = entity.firstName,
-                    lastName = entity.lastName,
-                    birthDate = entity.birthDate,
-                    phone = entity.phone,
-                    description = entity.description,
-                    registerDate = entity.registerDate,
-                    photoUrl = entity.photoUrl,
-                    type = entity.type,
-                    userEmail = entity.user?.email,
-                    districtName = entity.district?.name
-            )
-            resources.add(resource)
-        }
-        return resources
     }
 
     fun toResource(entity: Organizer) = OrganizerResource(

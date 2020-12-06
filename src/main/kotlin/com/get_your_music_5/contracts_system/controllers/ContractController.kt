@@ -29,7 +29,7 @@ class ContractController(
             val contracts = contractService.getAllByOrganizerId(organizerId)
             if (contracts.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(contracts), HttpStatus.OK)
+            ResponseEntity(contracts.map { contract -> this.toResource(contract) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -42,7 +42,7 @@ class ContractController(
             val contracts = contractService.getAllByMusicianId(musicianId)
             if (contracts.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(contracts), HttpStatus.OK)
+            ResponseEntity(contracts.map { contract -> this.toResource(contract) }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -93,26 +93,6 @@ class ContractController(
             startDate = resource.startDate,
             endDate = resource.endDate
     )
-
-    fun toResourceList(entities: List<Contract>) : List<ContractResource>{
-        val resources = mutableListOf<ContractResource>()
-        for(entity in entities){
-            val resource = ContractResource(
-                    id = entity.id,
-                    name = entity.name,
-                    address = entity.address,
-                    reference = entity.reference,
-                    startDate = entity.startDate,
-                    endDate = entity.endDate,
-                    organizerName = entity.organizer?.firstName,
-                    musicianName = entity.musician?.firstName,
-                    districtName = entity.district?.name,
-                    state = entity.state?.name
-            )
-            resources.add(resource)
-        }
-        return resources
-    }
 
     fun toResource(entity: Contract) = ContractResource(
             id = entity.id,
