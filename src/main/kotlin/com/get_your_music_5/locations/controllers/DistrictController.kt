@@ -25,18 +25,15 @@ class DistrictController(
             if (districts.isEmpty()) {
                 return ResponseEntity(HttpStatus.NO_CONTENT)
             }
-            ResponseEntity(toResourceList(districts), HttpStatus.OK)
+            ResponseEntity(districts.map { district -> this.toResource(district)  }, HttpStatus.OK)
         } catch (e: Exception) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    fun toResourceList(entities: List<District>) : List<DistrictResource>{
-        val resources = mutableListOf<DistrictResource>()
-        for(entity in entities){
-            val resource = DistrictResource(entity.id, entity.name, entity.province?.name)
-            resources.add(resource)
-        }
-        return resources
-    }
+    fun toResource(entity: District) = DistrictResource(
+            id = entity.id,
+            name = entity.name,
+            provinceName = entity.province?.name
+    )
 }

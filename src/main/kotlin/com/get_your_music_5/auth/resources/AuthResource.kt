@@ -4,4 +4,4 @@ data class MessageResponse(val message: String)
 
 data class LoginResource(val email: String, val password: String)
 
-data class JwtResponse(val jwt: String)
+data class JwtResponse(val token: String)

@@ -22,18 +22,15 @@ class ProvinceController(
             if (provinces.isEmpty()) {
                 return ResponseEntity(HttpStatus.NO_CONTENT)
             }
-            ResponseEntity(toResourceList(provinces), HttpStatus.OK)
+            ResponseEntity(provinces.map { province -> this.toResource(province)}, HttpStatus.OK)
         } catch (e: Exception) {
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
     }
 
-    fun toResourceList(entities: List<Province>) : List<ProvinceResource>{
-        val resources = mutableListOf<ProvinceResource>()
-        for(entity in entities){
-            val resource = ProvinceResource(entity.id, entity.name, entity.region?.name)
-            resources.add(resource)
-        }
-        return resources
-    }
+    fun toResource(entity: Province) = ProvinceResource(
+            id = entity.id,
+            name = entity.name,
+            regionName = entity.region?.name
+    )
 }

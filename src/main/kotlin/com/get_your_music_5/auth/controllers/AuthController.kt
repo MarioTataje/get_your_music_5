@@ -44,8 +44,8 @@ class AuthController(
         val authentication = manager.authenticate(
                 UsernamePasswordAuthenticationToken(user.email, user.password))
         SecurityContextHolder.getContext().authentication = authentication
-        val jwt = jwtUtil.generateJwtToken(authentication)
-        return ResponseEntity.ok<Any>(JwtResponse(jwt))
+        val token = jwtUtil.generateJwtToken(authentication)
+        return ResponseEntity.ok<Any>(JwtResponse(token))
     }
 
     fun toEntity(resource: SaveUserResource) = User(

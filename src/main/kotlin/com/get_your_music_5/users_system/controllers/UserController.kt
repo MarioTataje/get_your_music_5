@@ -19,7 +19,7 @@ class UserController(
             val users = userService.getAll()
             if (users.isEmpty())
                 return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(toResourceList(users), HttpStatus.OK)
+            ResponseEntity(users.map { user -> this.toResource(user)  }, HttpStatus.OK)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -51,15 +51,6 @@ class UserController(
             email = resource.email,
             password = resource.password
     )
-
-    fun toResourceList(entities: List<User>) : List<UserResource>{
-        val resources = mutableListOf<UserResource>()
-        for(entity in entities){
-            val resource = UserResource(entity.id, entity.email)
-            resources.add(resource)
-        }
-        return resources
-    }
 
     fun toResource(entity: User) = UserResource(
             id = entity.id,
