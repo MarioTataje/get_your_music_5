@@ -4,7 +4,6 @@ import com.get_your_music_5.social_system.models.Publication
 import com.get_your_music_5.social_system.resources.PublicationResource
 import com.get_your_music_5.social_system.resources.SavePublicationResource
 import com.get_your_music_5.social_system.services.PublicationService
-import com.get_your_music_5.users_system.services.MusicianService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -12,8 +11,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("api/")
 class PublicationController(
-        private val publicationService: PublicationService,
-        private val musicianService: MusicianService
+        private val publicationService: PublicationService
 ){
 
     @GetMapping("/publications/")
@@ -30,50 +28,29 @@ class PublicationController(
 
     @GetMapping("/musicians/{musicianId}/publications/")
     fun getAllPublicationsByMusicianId(@PathVariable musicianId: Long) : ResponseEntity<List<PublicationResource>> {
-        return try{
-            musicianService.getById(musicianId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val publications = publicationService.getAllByMusicianId(musicianId)
-            if (publications.isEmpty())
-                return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(publications.map{ publication -> this.toResource(publication)  }, HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val publications = publicationService.getAllByMusicianId(musicianId)
+        if (publications.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
+        return ResponseEntity(publications.map{ publication -> this.toResource(publication)  }, HttpStatus.OK)
     }
 
     @GetMapping("/publications/{publicationId}/")
     fun getPublicationById(@PathVariable publicationId: Long): ResponseEntity<PublicationResource> {
-        return try{
-            val existed = publicationService.getById(publicationId)
-            return if (existed != null) ResponseEntity(toResource(existed), HttpStatus.OK)
-            else ResponseEntity(HttpStatus.NOT_FOUND)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val existed = publicationService.getById(publicationId)
+        return ResponseEntity(toResource(existed), HttpStatus.OK)
     }
 
     @PostMapping("/musicians/{musicianId}/publications/")
     fun create(@RequestBody publication: SavePublicationResource, @PathVariable musicianId: Long)
             : ResponseEntity<PublicationResource> {
-        return try{
-            val musician = musicianService.getById(musicianId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val newPublication = publicationService.save(toEntity(publication), musician)
-            ResponseEntity(toResource(newPublication), HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val newPublication = publicationService.save(toEntity(publication), musicianId)
+        return ResponseEntity(toResource(newPublication), HttpStatus.OK)
     }
 
-    @PutMapping("/publications/{publicationId}/")
-    fun update(@PathVariable publicationId: Long, @RequestBody publication: SavePublicationResource):
+    @PutMapping("/publications/{id}/")
+    fun update(@PathVariable id: Long, @RequestBody publication: SavePublicationResource):
             ResponseEntity<PublicationResource> {
-        return try{
-            val existed = publicationService.getById(publicationId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val updated = publicationService.update(existed, toEntity(publication))
-            ResponseEntity(toResource(updated), HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val existed = publicationService.update(id, toEntity(publication))
+        return ResponseEntity(toResource(existed), HttpStatus.OK)
     }
 
     fun toEntity(resource: SavePublicationResource) = Publication(

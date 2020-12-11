@@ -4,8 +4,6 @@ import com.get_your_music_5.social_system.models.Comment
 import com.get_your_music_5.social_system.resources.CommentResource
 import com.get_your_music_5.social_system.resources.SaveCommentResource
 import com.get_your_music_5.social_system.services.CommentService
-import com.get_your_music_5.social_system.services.PublicationService
-import com.get_your_music_5.users_system.services.ProfileService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -13,35 +11,21 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("api/")
 class CommentController(
-        private val commentService: CommentService,
-        private val publicationService: PublicationService,
-        private val profileService: ProfileService
+        private val commentService: CommentService
 ){
 
     @GetMapping("/publications/{publicationId}/comments/")
     fun getAllCommentsByPublicationId(@PathVariable publicationId: Long) : ResponseEntity<List<CommentResource>> {
-        return try{
-            publicationService.getById(publicationId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val comments = commentService.getAllByPublicationId(publicationId)
-            if (comments.isEmpty())
-                return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(comments.map { comment -> this.toResource(comment) }, HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val comments = commentService.getAllByPublicationId(publicationId)
+        if (comments.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
+        return ResponseEntity(comments.map { comment -> this.toResource(comment) }, HttpStatus.OK)
     }
 
     @PostMapping("/publications/{publicationId}/commentators/{commenterId}/comments/")
     fun create(@RequestBody comment: SaveCommentResource,
                @PathVariable publicationId: Long, @PathVariable commenterId: Long) : ResponseEntity<CommentResource> {
-        return try{
-            val publication = publicationService.getById(publicationId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val commenter = profileService.getById(commenterId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val newComment = commentService.save(toEntity(comment), publication, commenter)
-            ResponseEntity(toResource(newComment), HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val newComment = commentService.save(toEntity(comment), publicationId, commenterId)
+        return ResponseEntity(toResource(newComment), HttpStatus.OK)
     }
 
     fun toEntity(resource: SaveCommentResource) = Comment(
