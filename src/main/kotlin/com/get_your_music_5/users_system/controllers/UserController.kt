@@ -25,26 +25,16 @@ class UserController(
         }
     }
 
-    @GetMapping("/users/{userId}/")
-    fun getUserById(@PathVariable userId: Long): ResponseEntity<UserResource> {
-        return try{
-            val existed = userService.getById(userId)
-            return if (existed != null) ResponseEntity(toResource(existed), HttpStatus.OK)
-            else ResponseEntity(HttpStatus.NOT_FOUND)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+    @GetMapping("/users/{id}/")
+    fun getUserById(@PathVariable id: Long): ResponseEntity<UserResource> {
+        val existed = userService.getById(id)
+        return ResponseEntity(toResource(existed), HttpStatus.OK)
     }
 
-    @PutMapping("/users/{userId}/")
-    fun update(@PathVariable userId: Long, @RequestBody user: SaveUserResource): ResponseEntity<UserResource> {
-        return try{
-            val existed = userService.getById(userId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val updated = userService.update(existed, toEntity(user))
-            ResponseEntity(toResource(updated), HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+    @PutMapping("/users/{id}/")
+    fun update(@PathVariable id: Long, @RequestBody user: SaveUserResource): ResponseEntity<UserResource> {
+        val existed = userService.update(id, toEntity(user))
+        return ResponseEntity(toResource(existed), HttpStatus.OK)
     }
 
     fun toEntity(resource: SaveUserResource) = User(

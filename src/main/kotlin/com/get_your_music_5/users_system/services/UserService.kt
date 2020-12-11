@@ -14,7 +14,8 @@ class UserService(
 ) {
     fun getAll(): List<User> = userRepository.findAll()
 
-    fun getById(userId: Long): User? = userRepository.findById(userId).orElse(null)
+    fun getById(id: Long): User = userRepository.findById(id)
+            .orElseThrow { NotFoundException("User", "id", id) }
 
     @Transactional
     fun save(user: User): User {
@@ -27,7 +28,8 @@ class UserService(
     }
 
     @Transactional
-    fun update(existed: User, user: User): User {
+    fun update(id: Long, user: User): User {
+        val existed = userRepository.findById(id).orElseThrow { NotFoundException("User", "id", id) }
         existed.email = user.email
         return userRepository.save(existed)
     }

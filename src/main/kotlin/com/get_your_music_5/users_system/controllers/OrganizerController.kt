@@ -27,15 +27,10 @@ class OrganizerController(
         }
     }
 
-    @GetMapping("/organizers/{organizerId}/")
-    fun getOrganizerById(@PathVariable organizerId: Long): ResponseEntity<OrganizerResource> {
-        return try{
-            val existed = organizerService.getById(organizerId)
-            return if (existed != null) ResponseEntity(toResource(existed), HttpStatus.OK)
-            else ResponseEntity(HttpStatus.NOT_FOUND)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+    @GetMapping("/organizers/{id}/")
+    fun getOrganizerById(@PathVariable id: Long): ResponseEntity<OrganizerResource> {
+        val existed = organizerService.getById(id)
+        return ResponseEntity(toResource(existed), HttpStatus.OK)
     }
 
     fun toResource(entity: Organizer) = OrganizerResource(

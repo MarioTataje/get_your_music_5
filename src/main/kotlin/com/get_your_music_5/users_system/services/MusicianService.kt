@@ -1,7 +1,8 @@
 package com.get_your_music_5.users_system.services
 
-import com.get_your_music_5.media_system.models.Genre
-import com.get_your_music_5.media_system.models.Instrument
+import com.get_your_music_5.locations.repositories.DistrictRepository
+import com.get_your_music_5.media_system.repositories.GenreRepository
+import com.get_your_music_5.media_system.repositories.InstrumentRepository
 import com.get_your_music_5.users_system.models.Musician
 import com.get_your_music_5.users_system.repositories.MusicianRepository
 import org.springframework.stereotype.Service
@@ -9,54 +10,77 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MusicianService(
-        private val musicianRepository: MusicianRepository
+        private val musicianRepository: MusicianRepository,
+        private val districtRepository: DistrictRepository,
+        private val genreRepository: GenreRepository,
+        private val instrumentRepository: InstrumentRepository
 ) {
     fun getAll(): List<Musician> = musicianRepository.findAll()
 
-    fun getAllByDistrictId(districtId: Long): List<Musician> = musicianRepository.getByDistrictId(districtId)
+    fun getAllByDistrictId(districtId: Long): List<Musician> {
+        districtRepository.findById(districtId).orElseThrow { NotFoundException("District", "id", districtId) }
+        return musicianRepository.getByDistrictId(districtId)
+    }
 
-    fun getAllByGenre(genre: Genre): MutableList<Musician> {
+    fun getAllByGenre(genreId: Long): MutableList<Musician> {
+        val genre = genreRepository.findById(genreId).orElseThrow { NotFoundException("Genre", "id", genreId) }
         return genre.musicians
     }
 
-    fun getAllByInstrument(instrument: Instrument): MutableList<Musician> {
+    fun getAllByInstrument(instrumentId: Long): MutableList<Musician> {
+        val instrument = instrumentRepository.
+        findById(instrumentId).orElseThrow { NotFoundException("Instrument", "id", instrumentId) }
         return instrument.musicians
     }
 
-    fun getById(musicianId: Long): Musician? {
-        return musicianRepository.findById(musicianId).orElse(null)
-    }
+    fun getById(id: Long): Musician = musicianRepository
+            .findById(id).orElseThrow { NotFoundException("Musician", "id", id) }
 
     @Transactional
-    fun addGenreToMusician(musician: Musician, genre: Genre){
-        if(!musician.genres.contains(genre)) {
+    fun addGenreToMusician(musicianId: Long, genreId: Long) {
+        val musician = musicianRepository.findById(musicianId)
+                .orElseThrow { NotFoundException("Musician", "id", musicianId) }
+        val genre = genreRepository.findById(genreId).
+        orElseThrow { NotFoundException("Genre", "id", genreId) }
+        if (!musician.genres.contains(genre)) {
             musician.genres.add(genre)
             musicianRepository.save(musician)
         }
     }
 
     @Transactional
-    fun deleteGenreToMusician(musician: Musician, genre: Genre){
-        if(musician.genres.contains(genre)){
+    fun deleteGenreToMusician(musicianId: Long, genreId: Long) {
+        val musician = musicianRepository.findById(musicianId)
+                .orElseThrow { NotFoundException("Musician", "id", musicianId) }
+        val genre = genreRepository.findById(genreId).
+        orElseThrow { NotFoundException("Genre", "id", genreId) }
+        if (musician.genres.contains(genre)) {
             musician.genres.remove(genre)
             musicianRepository.save(musician)
         }
     }
 
     @Transactional
-    fun addInstrumentToMusician(musician: Musician, instrument: Instrument){
-        if(!musician.instruments.contains(instrument)){
+    fun addInstrumentToMusician(musicianId: Long, instrumentId: Long) {
+        val musician = musicianRepository.findById(musicianId)
+                .orElseThrow { NotFoundException("Musician", "id", musicianId) }
+        val instrument = instrumentRepository.findById(instrumentId)
+                .orElseThrow { NotFoundException("Instrument", "id", instrumentId) }
+        if (!musician.instruments.contains(instrument)) {
             musician.instruments.add(instrument)
             musicianRepository.save(musician)
         }
     }
 
     @Transactional
-    fun deleteInstrumentToMusician(musician: Musician, instrument: Instrument){
-        if(musician.instruments.contains(instrument)){
+    fun deleteInstrumentToMusician(musicianId: Long, instrumentId: Long) {
+        val musician = musicianRepository.findById(musicianId)
+                .orElseThrow { NotFoundException("Musician", "id", musicianId) }
+        val instrument = instrumentRepository.findById(instrumentId)
+                .orElseThrow { NotFoundException("Instrument", "id", instrumentId) }
+        if (musician.instruments.contains(instrument)) {
             musician.instruments.remove(instrument)
             musicianRepository.save(musician)
         }
     }
-
 }
