@@ -4,10 +4,6 @@ import com.get_your_music_5.contracts_system.models.Contract
 import com.get_your_music_5.contracts_system.resources.ContractResource
 import com.get_your_music_5.contracts_system.resources.SaveContractResource
 import com.get_your_music_5.contracts_system.services.ContractService
-import com.get_your_music_5.contracts_system.services.ContractStateService
-import com.get_your_music_5.locations.services.DistrictService
-import com.get_your_music_5.users_system.services.MusicianService
-import com.get_your_music_5.users_system.services.OrganizerService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -15,75 +11,40 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("api/")
 class ContractController(
-        private val contractService: ContractService,
-        private val musicianService: MusicianService,
-        private val organizerService: OrganizerService,
-        private val contractStateService: ContractStateService,
-        private val districtService: DistrictService
+        private val contractService: ContractService
 ) {
 
     @GetMapping("/organizers/{organizerId}/contracts/")
     fun getAllContractsByOrganizerId(@PathVariable organizerId: Long): ResponseEntity<List<ContractResource>> {
-        return try{
-            organizerService.getById(organizerId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val contracts = contractService.getAllByOrganizerId(organizerId)
-            if (contracts.isEmpty())
-                return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(contracts.map { contract -> this.toResource(contract) }, HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val contracts = contractService.getAllByOrganizerId(organizerId)
+        if (contracts.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
+        return ResponseEntity(contracts.map { contract -> this.toResource(contract) }, HttpStatus.OK)
     }
 
     @GetMapping("/musicians/{musicianId}/contracts/")
     fun getAllContractsByMusicianId(@PathVariable musicianId: Long): ResponseEntity<List<ContractResource>> {
-        return try{
-            musicianService.getById(musicianId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val contracts = contractService.getAllByMusicianId(musicianId)
-            if (contracts.isEmpty())
-                return ResponseEntity(HttpStatus.NO_CONTENT)
-            ResponseEntity(contracts.map { contract -> this.toResource(contract) }, HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val contracts = contractService.getAllByMusicianId(musicianId)
+        if (contracts.isEmpty()) return ResponseEntity(HttpStatus.NO_CONTENT)
+        return ResponseEntity(contracts.map { contract -> this.toResource(contract) }, HttpStatus.OK)
     }
 
     @GetMapping("/contracts/{contractId}/")
     fun getContractById(@PathVariable contractId: Long): ResponseEntity<ContractResource> {
-        return try{
-            val existed = contractService.getById(contractId)
-            return if (existed != null) ResponseEntity(toResource(existed), HttpStatus.OK)
-            else ResponseEntity(HttpStatus.NOT_FOUND)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val existed = contractService.getById(contractId)
+        return ResponseEntity(toResource(existed), HttpStatus.OK)
     }
 
     @PostMapping("/organizers/{organizerId}/musicians/{musicianId}/districts/{districtId}/contracts/")
     fun create(@RequestBody contract: SaveContractResource, @PathVariable organizerId: Long,
                @PathVariable musicianId: Long, @PathVariable districtId: Long) : ResponseEntity<ContractResource> {
-        return try{
-            val state = contractStateService.getById(1) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val organizer = organizerService.getById(organizerId) ?:return ResponseEntity(HttpStatus.NOT_FOUND)
-            val musician = musicianService.getById(musicianId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val district = districtService.getById(districtId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val newContract = contractService.save(toEntity(contract), organizer, musician, district, state)
-            ResponseEntity(toResource(newContract), HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+        val newContract = contractService.save(toEntity(contract), organizerId, musicianId, districtId)
+        return ResponseEntity(toResource(newContract), HttpStatus.OK)
     }
 
-    @PutMapping("/contracts/{contractId}/states/{stateId}/")
-    fun updateState(@PathVariable contractId: Long, @PathVariable stateId: Long): ResponseEntity<ContractResource>{
-        return try{
-            val state = contractStateService.getById(stateId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val contract = contractService.getById(contractId) ?: return ResponseEntity(HttpStatus.NOT_FOUND)
-            val existed = contractService.updateState(contract, state)
-            ResponseEntity(toResource(existed), HttpStatus.OK)
-        } catch (e: Exception){
-            ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
-        }
+    @PutMapping("/contracts/{id}/states/{stateId}/")
+    fun updateState(@PathVariable id: Long, @PathVariable stateId: Long): ResponseEntity<ContractResource>{
+        val existed = contractService.updateState(id, stateId)
+        return ResponseEntity(toResource(existed), HttpStatus.OK)
     }
 
     fun toEntity(resource: SaveContractResource) = Contract(
