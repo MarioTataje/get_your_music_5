@@ -33,11 +33,11 @@ class ProfileController(
         return ResponseEntity(toResource(existed), HttpStatus.OK)
     }
 
-    @PostMapping("/districts/{districtId}/users/{userId}/profiles/")
-    fun create(@RequestBody profile: SaveProfileResource, @PathVariable userId: Long,
-               @PathVariable districtId: Long) : ResponseEntity<ProfileResource> {
+    @PostMapping("/users/{userId}/profiles/")
+    fun create(@RequestBody profile: SaveProfileResource, @PathVariable userId: Long)
+    : ResponseEntity<ProfileResource> {
         return try{
-            val newProfile = profileService.save(toEntity(profile), userId, districtId)
+            val newProfile = profileService.save(toEntity(profile), userId, profile.districtId)
             ResponseEntity(toResource(newProfile), HttpStatus.CREATED)
         } catch (e: Exception){
             ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)

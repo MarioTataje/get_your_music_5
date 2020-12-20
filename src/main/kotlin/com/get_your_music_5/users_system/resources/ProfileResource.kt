@@ -7,7 +7,8 @@ data class SaveProfileResource (
         val phone: String,
         val description: String,
         val photoUrl: String,
-        val type: String
+        val type: String,
+        val districtId: Long
 )
 
 open class ProfileResource(

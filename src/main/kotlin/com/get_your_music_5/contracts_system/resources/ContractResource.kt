@@ -5,7 +5,8 @@ data class SaveContractResource(
         val address: String,
         val reference: String,
         val startDate: String,
-        val endDate: String
+        val endDate: String,
+        val districtId: Long
 )
 
 data class ContractResource(

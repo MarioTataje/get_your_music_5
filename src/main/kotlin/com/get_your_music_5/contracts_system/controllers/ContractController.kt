@@ -34,10 +34,10 @@ class ContractController(
         return ResponseEntity(toResource(existed), HttpStatus.OK)
     }
 
-    @PostMapping("/organizers/{organizerId}/musicians/{musicianId}/districts/{districtId}/contracts/")
+    @PostMapping("/organizers/{organizerId}/musicians/{musicianId}/contracts/")
     fun create(@RequestBody contract: SaveContractResource, @PathVariable organizerId: Long,
-               @PathVariable musicianId: Long, @PathVariable districtId: Long) : ResponseEntity<ContractResource> {
-        val newContract = contractService.save(toEntity(contract), organizerId, musicianId, districtId)
+               @PathVariable musicianId: Long) : ResponseEntity<ContractResource> {
+        val newContract = contractService.save(toEntity(contract), organizerId, musicianId, contract.districtId)
         return ResponseEntity(toResource(newContract), HttpStatus.OK)
     }
 
