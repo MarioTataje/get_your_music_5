@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.session.SessionManagementFilter
 
 
 @Configuration
@@ -47,19 +48,25 @@ class WebSecurityConfig (
         return BCryptPasswordEncoder()
     }
 
+    @Bean
+    fun corsFilter(): CorsFilter? {
+        return CorsFilter()
+    }
+
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
-        http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests()
-                .antMatchers("/api/register/").permitAll()
-                .antMatchers("/api/login/").permitAll()
-                .antMatchers("/api/regions/").permitAll()
-                .antMatchers("/api/regions/**").permitAll()
-                .antMatchers("/api/provinces/**").permitAll()
-                .antMatchers("/api/districts/**").permitAll()
-                .anyRequest().authenticated()
+        http.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+            .authorizeRequests()
+            .and().addFilterBefore(corsFilter(), SessionManagementFilter::class.java)
+            .csrf().disable().authorizeRequests()
+            .antMatchers("/api/register/").permitAll()
+            .antMatchers("/api/login/").permitAll()
+            .antMatchers("/api/regions/").permitAll()
+            .antMatchers("/api/regions/**").permitAll()
+            .antMatchers("/api/provinces/**").permitAll()
+            .antMatchers("/api/districts/**").permitAll()
+            .anyRequest().authenticated()
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter::class.java)
     }
 
