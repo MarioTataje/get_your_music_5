@@ -16,8 +16,10 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.web.session.SessionManagementFilter
-
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import java.util.*
 
 @Configuration
 @EnableWebSecurity
@@ -49,8 +51,15 @@ class WebSecurityConfig (
     }
 
     @Bean
-    fun corsFilter(): CorsFilter? {
-        return CorsFilter()
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = Collections.singletonList("http://localhost:4200")
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        configuration.allowCredentials = true
+        configuration.allowedHeaders = listOf("Origin", "Content-Type", "Accept", "Authorization")
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
 
     @Throws(Exception::class)
@@ -58,7 +67,7 @@ class WebSecurityConfig (
         http.exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
             .authorizeRequests()
-            .and().addFilterBefore(corsFilter(), SessionManagementFilter::class.java)
+            .and().cors().and()
             .csrf().disable().authorizeRequests()
             .antMatchers("/api/register/").permitAll()
             .antMatchers("/api/login/").permitAll()
